@@ -8,6 +8,23 @@ A full-stack Ai based learning management system with a Django REST API and a Re
 backend/lms_backend/       Django project and REST API
 frontend/my-react-app/     React and Vite frontend
 ```
+ ## Key Features : 
+
+User & Teacher Authentication with secure role-based access.
+Separate Dashboards for students and teachers with role-specific functionalities.
+Student Profile Management including profile creation and editing.
+Email-Based Student Onboarding with automated login credentials sent via email.
+Assessment Management System for creating, scheduling, and managing assessments.
+AI-Powered Assessment Generation using LLaMA LLM integration.
+Scheduled Assessments with proper start/end time management.
+Student Assessment Portal for viewing and attempting assigned assessments.
+Search & Filtering for efficiently managing students, teachers, and assessments.
+Pagination for optimized handling of large datasets.
+RESTful APIs developed using Django REST Framework.
+Role-Based Access Control (RBAC) to protect resources and functionality.
+AI Integration to automate and enhance assessment creation.
+Complete LMS Workflow covering user management, learning assessments, scheduling, and AI-assisted content generation.
+
 
 ## Requirements
 
