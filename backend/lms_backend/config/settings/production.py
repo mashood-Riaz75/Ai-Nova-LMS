@@ -18,7 +18,8 @@ DATABASES = {
     )
 }
 
-CORS_ALLOWED_ORIGINS = os.getenv(
-    "CORS_ALLOWED_ORIGINS",
-    "",
-).split(",")
+CORS_ALLOWED_ORIGINS = [
+    origin.strip().rstrip("/")
+    for origin in [os.environ.get("FRONTEND_URL", "")]
+    if origin and origin.strip()
+]
