@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.apps import apps
+from django.db import transaction
 
 logger = logging.getLogger("lms.audit")
 
@@ -50,7 +51,7 @@ def on_student_user_created(sender, instance, created, **kwargs):
 
         logger.info(f"[AUDIT] New Student Account Created: ID={instance.id} | Email={instance.email}")
 
-        # Dispatch Email Credentials
+        # Send credentials only after the account and profile transaction commits.
         if instance.email:
             email_subject = "Your LMS Student Credentials"
             email_body = (
@@ -62,14 +63,17 @@ def on_student_user_created(sender, instance, created, **kwargs):
                 f"Please log in and update your profile."
             )
 
-            try:
-                send_mail(
-                    subject=email_subject,
-                    message=email_body,
-                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'webmaster@localhost'),
-                    recipient_list=[instance.email],
-                    fail_silently=False,
-                )
-                logger.info(f"[EMAIL DISPATCH] Sent login credentials to {instance.email}")
-            except Exception as exc:
-                logger.error(f"[EMAIL ERROR] Failed to deliver credentials to {instance.email}: {str(exc)}")
+            def send_student_credentials():
+                try:
+                    send_mail(
+                        subject=email_subject,
+                        message=email_body,
+                        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'webmaster@localhost'),
+                        recipient_list=[instance.email],
+                        fail_silently=False,
+                    )
+                    logger.info(f"[EMAIL DISPATCH] Sent login credentials to {instance.email}")
+                except Exception as exc:
+                    logger.error(f"[EMAIL ERROR] Failed to deliver credentials to {instance.email}: {str(exc)}")
+
+            transaction.on_commit(send_student_credentials)

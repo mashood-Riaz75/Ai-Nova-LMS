@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
+from django.db import transaction
 
 from .models import StudentProfile
 
@@ -144,6 +145,7 @@ class StudentAdminSerializer(serializers.ModelSerializer):
             "student_profile",
         ]
 
+    @transaction.atomic
     def create(self, validated_data):
         password = validated_data.pop("password", None)
 

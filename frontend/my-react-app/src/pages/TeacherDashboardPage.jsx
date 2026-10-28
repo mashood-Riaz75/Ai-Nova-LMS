@@ -25,6 +25,7 @@ export default function TeacherDashboardPage() {
   const [editingStudentId, setEditingStudentId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [assessmentsLoading, setAssessmentsLoading] = useState(true);
+  const [savingStudent, setSavingStudent] = useState(false);
 
   // Deletion Confirmation Modal States
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -125,10 +126,11 @@ export default function TeacherDashboardPage() {
   const handleSaveStudent = async (e) => {
     e.preventDefault();
 
-    if (!validateStudentForm()) {
+    if (savingStudent || !validateStudentForm()) {
       return;
     }
 
+    setSavingStudent(true);
     try {
       const payload = {
         ...studentForm,
@@ -162,6 +164,8 @@ export default function TeacherDashboardPage() {
         validationMessages.join(' ') ||
         `Failed to ${editingStudentId ? 'update' : 'create'} student.`;
       toast.error(message);
+    } finally {
+      setSavingStudent(false);
     }
   };
 
@@ -414,9 +418,12 @@ export default function TeacherDashboardPage() {
           </div>
           <button
             type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 rounded-lg mt-4"
+            disabled={savingStudent}
+            className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-medium py-2 rounded-lg mt-4"
           >
-            {editingStudentId ? 'Save Changes' : 'Create Account'}
+            {savingStudent
+              ? editingStudentId ? 'Saving...' : 'Creating...'
+              : editingStudentId ? 'Save Changes' : 'Create Account'}
           </button>
         </form>
       </Modal>
