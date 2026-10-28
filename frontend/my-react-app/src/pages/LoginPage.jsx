@@ -59,7 +59,13 @@ export default function LoginPage() {
         navigate('/');
       }
     } catch (err) {
-      const message = err.response?.data?.detail || 'Invalid email or password.';
+      const message =
+        err.response?.status === 401
+          ? 'Invalid email or password.'
+          : err.response?.data?.detail ||
+            (err.response
+              ? `Login failed (HTTP ${err.response.status}).`
+              : 'Unable to reach the server. Check your connection and try again.');
       setError(message);
       toast.error(message);
     } finally {

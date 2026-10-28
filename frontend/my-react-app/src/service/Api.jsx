@@ -1,7 +1,31 @@
 
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const DEFAULT_API_BASE_URL = import.meta.env.DEV
+  ? 'http://localhost:8000'
+  : 'https://ai-nova-lms-production.up.railway.app';
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+const normalizedApiBaseUrl = configuredApiBaseUrl
+  ?.replace(/\/+$/, '')
+  .replace(/\/api$/i, '');
+const configuredApiUrl = normalizedApiBaseUrl
+  ? new URL(normalizedApiBaseUrl)
+  : null;
+const isLocalApiInProduction =
+  import.meta.env.PROD &&
+  configuredApiUrl &&
+  ['localhost', '127.0.0.1'].includes(configuredApiUrl.hostname);
+
+if (isLocalApiInProduction) {
+  console.warn(
+    'Ignoring the localhost VITE_API_BASE_URL in production and using the production API.'
+  );
+}
+
+const API_BASE_URL =
+  normalizedApiBaseUrl && !isLocalApiInProduction
+    ? normalizedApiBaseUrl
+    : DEFAULT_API_BASE_URL;
 
 const API = axios.create({
   baseURL: `${API_BASE_URL}/api`,

@@ -56,7 +56,7 @@ npm install
 npm run dev
 ```
 
-The frontend expects the API at `http://localhost:8000/api`. Start the backend first, or update `src/service/Api.jsx` when using a different API URL.
+The frontend uses `VITE_API_BASE_URL` as the backend origin and appends `/api` automatically. For local development, it defaults to `http://localhost:8000`; in production, it defaults to `https://ai-nova-lms-production.up.railway.app`. Set `VITE_API_BASE_URL` in the frontend hosting provider's build environment if the backend is hosted elsewhere. Set only the origin (for example, `https://api.example.com`), without `/api`.
 
 ## Useful Commands
 
