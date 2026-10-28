@@ -114,6 +114,11 @@ export default function TeacherDashboardPage() {
       return false;
     }
 
+    if (studentForm.contact_number.length > 13) {
+      toast.error('Contact number must be 13 characters or fewer.');
+      return false;
+    }
+
     return true;
   };
 
@@ -401,6 +406,7 @@ export default function TeacherDashboardPage() {
             <input
               type="tel"
               required
+              maxLength={13}
               value={studentForm.contact_number}
               onChange={(e) => setStudentForm({ ...studentForm, contact_number: e.target.value })}
               className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"

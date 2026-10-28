@@ -108,6 +108,7 @@ class StudentAdminSerializer(serializers.ModelSerializer):
     )
 
     contact_number = serializers.CharField(
+        max_length=13,
         required=False,
         allow_blank=True,
         allow_null=True,
