@@ -125,7 +125,11 @@ export default function TeacherDashboardPage() {
     }
 
     try {
-      const payload = { ...studentForm, role: 'STUDENT' };
+      const payload = {
+        ...studentForm,
+        date_of_birth: studentForm.date_of_birth || null,
+        role: 'STUDENT',
+      };
       if (editingStudentId) {
         await API.patch(`/users/students/${editingStudentId}/`, payload);
         toast.success('Student updated successfully.');
@@ -137,7 +141,21 @@ export default function TeacherDashboardPage() {
       resetStudentForm();
       fetchStudents();
     } catch (err) {
-      const message = err.response?.data?.detail || `Failed to ${editingStudentId ? 'update' : 'create'} student.`;
+      const responseData = err.response?.data;
+      const validationMessages = responseData
+        ? Object.entries(responseData).flatMap(([field, messages]) =>
+            Array.isArray(messages)
+              ? messages.map((message) =>
+                  field === 'non_field_errors' ? message : `${field}: ${message}`
+                )
+              : typeof messages === 'string'
+                ? [`${field}: ${messages}`]
+                : []
+          )
+        : [];
+      const message =
+        validationMessages.join(' ') ||
+        `Failed to ${editingStudentId ? 'update' : 'create'} student.`;
       toast.error(message);
     }
   };
