@@ -5,7 +5,7 @@ import logging
 import secrets
 import string
 from threading import Thread
-
+from apps.users.tasks import send_student_credentials_email
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
@@ -64,23 +64,39 @@ def on_student_user_created(sender, instance, created, **kwargs):
     )
 
     # No email address means there is no recipient to notify.
-    if not instance.email:
-        logger.warning(
-            "[EMAIL SKIPPED] Student ID=%s has no email address.",
-            instance.id,
-        )
-        return
+    if instance.email:
+            email_subject = "Your LMS Student Credentials"
 
-    email_subject = "Your LMS Student Credentials"
+            email_body = (
+                f"Hello {instance.first_name or 'Student'},\n\n"
+                "Your student account has been created by your teacher.\n\n"
+                f"Student ID: {profile.student_id}\n"
+                f"Login Email: {instance.email}\n"
+                f"Password: {raw_password}\n\n"
+                "Please log in and update your profile."
+            )
 
-    email_body = (
-        f"Hello {instance.first_name or 'Student'},\n\n"
-        "Your student account has been created by your teacher.\n\n"
-        f"Student ID: {profile.student_id}\n"
-        f"Login Email: {instance.email}\n"
-        f"Password: {raw_password}\n\n"
-        "Please log in and update your profile."
-    )
+            def enqueue_student_email():
+                try:
+                    send_student_credentials_email.delay(
+                        recipient_email=instance.email,
+                        subject=email_subject,
+                        message=email_body,
+                    )
+
+                    logger.info(
+                        "[EMAIL QUEUED] Credentials email queued for %s",
+                        instance.email,
+                    )
+
+                except Exception:
+                    logger.exception(
+                        "[EMAIL QUEUE ERROR] Could not queue email "
+                        "for %s",
+                        instance.email,
+                    )
+
+            transaction.on_commit(enqueue_student_email)
 
     # Capture values now so the background task doesn't depend on
     # a subsequently modified model instance.
