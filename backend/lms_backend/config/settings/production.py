@@ -28,3 +28,4 @@ CORS_ALLOWED_ORIGINS = [
     for origin in [os.environ.get("FRONTEND_URL", "")]
     if origin and origin.strip()
 ]
+EMAIL_TIMEOUT = 15
