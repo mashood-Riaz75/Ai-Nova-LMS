@@ -29,3 +29,6 @@ CORS_ALLOWED_ORIGINS = [
     if origin and origin.strip()
 ]
 EMAIL_TIMEOUT = 15
+CELERY_BROKER_URL = os.environ.get(
+    "CELERY_BROKER_URL"
+) or os.environ.get("REDIS_URL")
