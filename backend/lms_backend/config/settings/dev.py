@@ -37,7 +37,8 @@ INSTALLED_APPS = [
 
     # Local modular apps
     'apps.core',
-    'apps.users',
+    'apps.users.apps.UsersConfig',
+    # 'apps.users',
     'apps.assessments',
 ]
 
