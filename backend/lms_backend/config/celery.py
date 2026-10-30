@@ -12,4 +12,4 @@ app = Celery("lms_backend")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
 app.autodiscover_tasks()
-CELERY_BROKER_URL = os.environ.get("REDIS_URL")
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL") or os.getenv("REDIS_URL")
