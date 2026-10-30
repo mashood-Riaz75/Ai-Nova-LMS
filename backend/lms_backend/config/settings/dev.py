@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    "anymail",
     #swagger
    "drf_spectacular",
 
@@ -52,17 +52,23 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', '5434'),
     }
 }
-
 # Email Configuration
-EMAIL_BACKEND = os.getenv(
-    "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
-)
-EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ["true", "1", "t"]
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
+if os.environ.get("BREVO_API_KEY"):
+       EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+       ANYMAIL = {"BREVO_API_KEY": os.environ["BREVO_API_KEY"]}
+else:
+       EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # local testing prints to terminal
+
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+# EMAIL_BACKEND = os.getenv(
+#     "EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
+# )
+# EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+# EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+# EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ["true", "1", "t"]
+# EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+# DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -210,9 +216,10 @@ CORS_ALLOW_METHODS = [
 ]
 import os
 
-CELERY_BROKER_URL = os.getenv(
-    "REDIS_URL",
-    "redis://127.0.0.1:6379/0",
+CELERY_BROKER_URL = (
+    os.getenv("CELERY_BROKER_URL")
+    or os.getenv("REDIS_URL")
+    or "redis://127.0.0.1:6379/0"
 )
 
 CELERY_TASK_IGNORE_RESULT = True
