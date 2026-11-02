@@ -58,6 +58,22 @@ npm run dev
 
 The frontend uses `VITE_API_BASE_URL` as the backend origin and appends `/api` automatically. For local development, it defaults to `http://localhost:8000`; in production, it defaults to `https://ai-nova-lms-production.up.railway.app`. Set `VITE_API_BASE_URL` in the frontend hosting provider's build environment if the backend is hosted elsewhere. Set only the origin (for example, `https://api.example.com`), without `/api`.
 
+## Production Email and Background Tasks
+
+Production email is sent through Brevo and student credential emails are queued with Celery. Configure these variables on both the backend web service and its Celery worker:
+
+- `BREVO_API_KEY`: Brevo API key.
+- `DEFAULT_FROM_EMAIL`: sender address verified in Brevo.
+- `CELERY_BROKER_URL` or `REDIS_URL`: connection URL for the same Redis service.
+
+The backend now fails to start if any required setting is missing instead of silently using the local console email backend. Deploy a separate worker using the same backend code, environment variables, and working directory (`backend/lms_backend`), with this start command:
+
+```powershell
+celery -A config worker --loglevel=info
+```
+
+In the web service logs, `[EMAIL QUEUED]` means Redis accepted the task; in the worker logs, `[EMAIL DISPATCH]` means the email backend accepted it. Check Brevo's email activity for final delivery status.
+
 ## Useful Commands
 
 ```powershell

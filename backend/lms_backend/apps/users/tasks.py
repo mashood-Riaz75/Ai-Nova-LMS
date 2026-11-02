@@ -37,7 +37,7 @@ def send_student_credentials_email(
         )
 
     logger.info(
-        "[EMAIL DISPATCH] Email accepted by SMTP for %s",
+        "[EMAIL DISPATCH] Email accepted by configured backend for %s",
         recipient_email,
     )
 

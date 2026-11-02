@@ -16,7 +16,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b").strip()
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -221,7 +221,7 @@ CELERY_BROKER_URL = (
     os.getenv("CELERY_BROKER_URL")
     or os.getenv("REDIS_URL")
     or "redis://127.0.0.1:6379/0"
-)
+).strip()
 
 CELERY_TASK_IGNORE_RESULT = True
 CELERY_TASK_TRACK_STARTED = True

@@ -10,7 +10,7 @@ def generate_questions_for_assessment(assessment_id: str):
     assessment = Assessment.objects.get(id=assessment_id)
     
     # 1. Safely retrieve API key from os.environ or Django settings
-    api_key = os.getenv("GROQ_API_KEY") or getattr(settings, "GROQ_API_KEY", None)
+    api_key = (os.getenv("GROQ_API_KEY") or getattr(settings, "GROQ_API_KEY", None) or "").strip()
     if not api_key:
         raise ValueError("GROQ_API_KEY is not set in environment variables or Django settings.")
 
@@ -51,19 +51,22 @@ def generate_questions_for_assessment(assessment_id: str):
 
     # Call Groq's high-speed Llama 3.3 model
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model=getattr(settings, "GROQ_MODEL", "openai/gpt-oss-120b"),
         messages=[
             {
-                "role": "system", 
+                "role": "system",
                 "content": "You are an automated academic question generator. You must respond strictly in JSON format matching the requested schema."
             },
             {"role": "user", "content": prompt}
         ],
         temperature=0.3,
+        max_completion_tokens=8000,
         response_format={"type": "json_object"}
     )
 
-    content = response.choices[0].message.content.strip()
+    content = (response.choices[0].message.content or "").strip()
+    if not content:
+        raise ValueError("The model returned an empty response. Try again.")
     
     # Clean markdown backticks cleanly using regex
     content = re.sub(r'^```(?:json)?\s*', '', content, flags=re.MULTILINE)
