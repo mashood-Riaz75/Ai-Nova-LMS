@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import API from '../service/Api';
 import Navbar from '../components/Navbar';
 import Modal from '../components/Modal';
-import { UserPlus, BookOpen, Users, Edit3, Trash2, AlertTriangle } from 'lucide-react';
+import { UserPlus, BookOpen, Users, Edit3, Trash2, AlertTriangle, Search } from 'lucide-react';
 
 const initialStudentForm = {
   email: '',
@@ -19,6 +19,9 @@ const initialStudentForm = {
 
 export default function TeacherDashboardPage() {
   const [students, setStudents] = useState([]);
+  const [studentCount, setStudentCount] = useState(0);
+  const [studentSearch, setStudentSearch] = useState('');
+  const [studentPage, setStudentPage] = useState(1);
   const [assessments, setAssessments] = useState([]);
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [studentForm, setStudentForm] = useState(initialStudentForm);
@@ -60,18 +63,43 @@ export default function TeacherDashboardPage() {
   ];
 
   useEffect(() => {
-    fetchStudents();
+    let isCurrent = true;
+    const timeoutId = window.setTimeout(() => {
+      fetchStudents(() => isCurrent);
+    }, 250);
+
+    return () => {
+      isCurrent = false;
+      window.clearTimeout(timeoutId);
+    };
+  }, [studentSearch, studentPage]);
+
+  useEffect(() => {
     fetchAssessments();
   }, []);
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (isCurrent = () => true) => {
     try {
-      const res = await API.get('/users/students/');
-      setStudents(res.data.results || res.data);
+      const res = await API.get('/users/students/', {
+        params: {
+          page: studentPage,
+          page_size: 5,
+          search: studentSearch.trim() || undefined,
+        },
+      });
+      if (!isCurrent()) return;
+      const results = res.data.results || res.data;
+      const count = res.data.count ?? results.length;
+      setStudents(results);
+      setStudentCount(count);
+      const lastPage = Math.max(1, Math.ceil(count / 5));
+      if (studentPage > lastPage) {
+        setStudentPage(lastPage);
+      }
     } catch (err) {
-      console.error(err);
+      if (isCurrent()) console.error(err);
     } finally {
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
   };
 
@@ -237,7 +265,7 @@ export default function TeacherDashboardPage() {
               <Users className="w-8 h-8" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-white">{students.length}</div>
+              <div className="text-2xl font-bold text-white">{studentCount}</div>
               <div className="text-sm text-slate-400">Total Enrolled Students</div>
             </div>
           </div>
@@ -254,7 +282,23 @@ export default function TeacherDashboardPage() {
 
         {/* Student Roster Table */}
         <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
-          <div className="px-6 py-4 border-b border-slate-700 font-semibold text-white">Student Roster</div>
+          <div className="flex flex-col gap-3 border-b border-slate-700 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="font-semibold text-white">Student Roster</h2>
+            <div className="relative w-full sm:max-w-xs">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                type="search"
+                value={studentSearch}
+                onChange={(event) => {
+                  setStudentSearch(event.target.value);
+                  setStudentPage(1);
+                }}
+                placeholder="Search name, email, course..."
+                aria-label="Search students"
+                className="w-full rounded-lg border border-slate-700 bg-slate-900 py-2 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+              />
+            </div>
+          </div>
           {loading ? (
             <div className="p-8 text-center text-slate-400">Loading student roster...</div>
           ) : (
@@ -273,7 +317,13 @@ export default function TeacherDashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-700">
-                  {students.map((st) => (
+                  {students.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" className="px-6 py-8 text-center text-slate-400">
+                        No students match your search.
+                      </td>
+                    </tr>
+                  ) : students.map((st) => (
                     <tr key={st.id} className="hover:bg-slate-700/30 transition-colors">
                       <td className="px-6 py-4 text-slate-300">{st.student_profile?.student_id || '-'}</td>
                       <td className="px-6 py-4 font-medium text-white">{st.first_name} {st.last_name}</td>
@@ -302,6 +352,32 @@ export default function TeacherDashboardPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+          {!loading && (
+            <div className="flex flex-col gap-3 border-t border-slate-700 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-slate-400">
+                Showing {studentCount === 0 ? 0 : (studentPage - 1) * 5 + 1}-{Math.min(studentPage * 5, studentCount)} of {studentCount} students
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setStudentPage((page) => Math.max(1, page - 1))}
+                  disabled={studentPage === 1}
+                  className="rounded border border-slate-600 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-slate-400">Page {studentPage} of {Math.max(1, Math.ceil(studentCount / 5))}</span>
+                <button
+                  type="button"
+                  onClick={() => setStudentPage((page) => page + 1)}
+                  disabled={studentPage >= Math.ceil(studentCount / 5)}
+                  className="rounded border border-slate-600 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>

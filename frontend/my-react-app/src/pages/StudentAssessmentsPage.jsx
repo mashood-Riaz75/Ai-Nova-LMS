@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Trash2,
   Eye,
+  Search,
 } from 'lucide-react';
 
 
@@ -86,8 +87,27 @@ export default function StudentAssessmentsPage() {
     setRemovingId
   ] = useState(null);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+
   const navigate =
     useNavigate();
+
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const filteredTasks = studentTasks.filter((item) => {
+    const task = item.task || {};
+    return `${task.title || ''} ${task.description || ''}`
+      .toLowerCase()
+      .includes(normalizedSearch);
+  });
+  const totalPages = Math.max(1, Math.ceil(filteredTasks.length / 5));
+  const visibleTasks = filteredTasks.slice((currentPage - 1) * 5, currentPage * 5);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
 
   // ========================================================
@@ -309,9 +329,34 @@ export default function StudentAssessmentsPage() {
         </div>
 
 
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative w-full sm:max-w-sm">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => {
+                setSearchQuery(event.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search assessments..."
+              aria-label="Search assessments"
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
+          <p className="text-sm text-slate-400">
+            Showing {filteredTasks.length === 0 ? 0 : (currentPage - 1) * 5 + 1}-{Math.min(currentPage * 5, filteredTasks.length)} of {filteredTasks.length} assessments
+          </p>
+        </div>
+
+        {visibleTasks.length === 0 ? (
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-8 text-center text-slate-400">
+            No assessments match your search.
+          </div>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-          {studentTasks.map((item) => {
+          {visibleTasks.map((item) => {
 
             const task =
               item.task || {};
@@ -522,6 +567,29 @@ export default function StudentAssessmentsPage() {
           })}
 
         </div>
+        )}
+
+        {filteredTasks.length > 5 && (
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={currentPage === 1}
+              className="rounded border border-slate-600 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-slate-400">Page {currentPage} of {totalPages}</span>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+              disabled={currentPage === totalPages}
+              className="rounded border border-slate-600 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
 
       </main>
 

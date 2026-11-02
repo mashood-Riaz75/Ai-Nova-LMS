@@ -115,7 +115,15 @@ class TeacherStudentViewSet(viewsets.ModelViewSet):
     serializer_class = StudentCreateSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter,]
-    search_fields = [  "email", "first_name",  "last_name",]
+    search_fields = [
+        "email",
+        "first_name",
+        "last_name",
+        "student_profile__student_id",
+        "student_profile__department",
+        "student_profile__course",
+        "student_profile__city",
+    ]
     filterset_fields = [ "is_active",]
     ordering_fields = ["date_joined", "email", "first_name", "last_name",]
     ordering = ["-date_joined",]
