@@ -181,6 +181,14 @@ class AssessmentWriteSerializer(serializers.ModelSerializer):
         allow_null=True
     )
 
+    def validate(self, attrs):
+        time_limit = attrs.get(
+            'time_limit_minutes',
+            getattr(self.instance, 'time_limit_minutes', 30),
+        )
+        attrs['time_limit_minutes'] = max(30, time_limit)
+        return attrs
+
     class Meta:
         model = Assessment
 

@@ -80,6 +80,17 @@ def generate_questions_for_assessment(assessment_id: str):
     else:
         questions_data = parsed_data
 
+    if not isinstance(questions_data, list):
+        raise ValueError("The model response did not contain a questions list.")
+
+    expected_count = assessment.total_questions
+    if len(questions_data) < expected_count:
+        raise ValueError(
+            f"The model returned {len(questions_data)} questions; "
+            f"{expected_count} are required."
+        )
+    questions_data = questions_data[:expected_count]
+
     # Save to DB inside an atomic transaction
     with transaction.atomic():
         for q_item in questions_data:

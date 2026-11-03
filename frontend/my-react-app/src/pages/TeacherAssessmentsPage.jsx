@@ -954,7 +954,7 @@ export default function TeacherAssessmentsPage() {
 
               <input
                 type="number"
-                min="1"
+                min="30"
                 value={
                   assessmentForm.time_limit_minutes
                 }
@@ -962,7 +962,7 @@ export default function TeacherAssessmentsPage() {
                   setAssessmentForm({
                     ...assessmentForm,
                     time_limit_minutes:
-                      Number(e.target.value),
+                      Math.max(30, Number(e.target.value) || 30),
                   })
                 }
                 className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"

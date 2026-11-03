@@ -553,7 +553,9 @@ export default function StudentAssessmentsPage() {
                       {isScheduled
                         ? 'Starts Later'
                         : canStart
-                          ? 'Start Assessment'
+                          ? item.status === 'IN_PROGRESS'
+                            ? 'Resume Assessment'
+                            : 'Start Assessment'
                           : 'Unavailable'}
 
                     </button>

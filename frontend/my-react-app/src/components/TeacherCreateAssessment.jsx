@@ -117,13 +117,16 @@ export default function TeacherCreateAssessmentModal({ isOpen, onClose, onCreate
             <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">Duration (Minutes)</label>
             <input
               type="number"
-              min="5"
+              min="30"
               max="180"
               required
               disabled={loading}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 disabled:bg-slate-100"
               value={formData.time_limit_minutes}
-              onChange={(e) => setFormData({ ...formData, time_limit_minutes: parseInt(e.target.value, 10) || '' })}
+              onChange={(e) => setFormData({
+                ...formData,
+                time_limit_minutes: Math.max(30, parseInt(e.target.value, 10) || 30),
+              })}
             />
           </div>
 
