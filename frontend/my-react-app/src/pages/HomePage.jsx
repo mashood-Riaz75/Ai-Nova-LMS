@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, GraduationCap, ShieldCheck, Award, ArrowRight, UserCheck } from 'lucide-react';
+import { BookOpen, GraduationCap, Award, ArrowRight, UserCheck } from 'lucide-react';
+import Footer from '../components/Footer';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <div id="top" className="min-h-screen bg-slate-50 text-slate-900 font-sans">
       {/* Navigation Bar */}
       <nav className="flex items-center justify-between px-8 py-4 bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="flex items-center gap-2">
@@ -85,10 +86,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="mt-20 border-t border-slate-200 bg-white py-8 text-center text-sm text-slate-500">
-        &copy; {new Date().getFullYear()} LMS Platform. Built with React &amp; Django.
-      </footer>
+      <Footer />
     </div>
   );
 }
