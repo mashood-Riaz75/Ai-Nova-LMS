@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'apps.users.apps.UsersConfig',
     # 'apps.users',
     'apps.assessments',
+    'apps.chatbot',
 ]
 
 # Base Database Configuration
@@ -135,6 +136,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'apps.core.pagination.StandardResultsSetPagination',
     'PAGE_SIZE': 10,
     'EXCEPTION_HANDLER': 'apps.core.exceptions.custom_exception_handler',
+    'DEFAULT_THROTTLE_RATES': {
+        'chat': '20/min',
+    },
 
      "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }

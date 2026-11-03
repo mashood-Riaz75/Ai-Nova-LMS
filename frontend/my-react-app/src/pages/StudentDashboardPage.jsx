@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import API from '../service/Api';
 import Navbar from '../components/Navbar';
+import ChatWidget from '../components/ChatWidget';
 
 export default function StudentDashboardPage() {
   const [studentProfile, setStudentProfile] = useState(null);
@@ -283,6 +284,7 @@ export default function StudentDashboardPage() {
           </div>
         </div>
       </main>
+      <ChatWidget />
     </div>
   );
 }

@@ -58,6 +58,29 @@ npm run dev
 
 The frontend uses `VITE_API_BASE_URL` as the backend origin and appends `/api` automatically. For local development, it defaults to `http://localhost:8000`; in production, it defaults to `https://ai-nova-lms-production.up.railway.app`. Set `VITE_API_BASE_URL` in the frontend hosting provider's build environment if the backend is hosted elsewhere. Set only the origin (for example, `https://api.example.com`), without `/api`.
 
+## Student Support Chat
+
+The student dashboard includes a support chat for the signed-in student's assessment schedule/status, submitted results, and profile information. It is not a course-material tutor. The endpoint requires a student JWT and accepts:
+
+```http
+POST /api/chat/
+Authorization: Bearer <access-token>
+Content-Type: application/json
+
+{"message": "When is my next assessment?"}
+```
+
+`message` is required, trimmed, and limited to 1000 characters. `session_id` is optional; conversations are private to the authenticated student. Successful replies contain `reply` and `session_id`. Chat requests are limited to 20 per minute per user. The Groq-backed tools only read the student's own profile, assignments, and results.
+
+Configure `GROQ_API_KEY` in the backend environment. `GROQ_MODEL` is optional and defaults to the existing `openai/gpt-oss-120b` model. The chatbot reuses the project's OpenAI-compatible Groq API endpoint and adds no dependency or infrastructure.
+
+After updating the backend, run these commands from `backend/lms_backend`:
+
+```powershell
+python manage.py migrate
+python manage.py test apps.chatbot
+```
+
 ## Production Email and Background Tasks
 
 Production email is sent through Brevo and student credential emails are queued with Celery. Configure these variables on both the backend web service and its Celery worker:
