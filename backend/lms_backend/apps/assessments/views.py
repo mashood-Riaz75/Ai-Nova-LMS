@@ -789,6 +789,15 @@ class StudentAssessmentQuestionsView(APIView):
             )
             .order_by("order_index")
         )
+        states = list(states)
+        current_question_index = next(
+            (
+                index
+                for index, state in enumerate(states)
+                if not state.is_answered
+            ),
+            len(states),
+        )
 
         return Response({
             "attempt_id":
@@ -831,6 +840,9 @@ class StudentAssessmentQuestionsView(APIView):
                 states,
                 many=True,
             ).data,
+
+            "current_question_index":
+            current_question_index,
         })
 
 
@@ -1328,12 +1340,13 @@ class QuitAssessmentView(APIView):
     @extend_schema(
         summary="Quit assessment",
         description=(
-            "Ends the student's active assessment attempt."
+            "Pauses the active attempt so the student "
+            "can resume it later."
         ),
         responses={
             200: OpenApiResponse(
                 description=(
-                    "Assessment quit successfully."
+                    "Assessment paused successfully."
                 )
             ),
             400: OpenApiResponse(
@@ -1369,34 +1382,9 @@ class QuitAssessmentView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        attempt.status = (
-            StudentAssessmentAttempt
-            .Status
-            .SUBMITTED
-        )
-
-        attempt.completed_at = (
-            timezone.now()
-        )
-
-        # Calculate score for answered questions
-        attempt.score = sum(
-            state.question.marks
-            for state in (
-                StudentQuestionState.objects
-                .filter(
-                    attempt=attempt,
-                    is_answered=True,
-                    selected_option__is_correct=True,
-                )
-            )
-        )
-
-        attempt.save()
-
         return Response({
             "detail":
-            "Assessment quit successfully.",
+            "Assessment paused. You can resume it later.",
 
             "attempt_id":
             str(attempt.id),
@@ -1441,10 +1429,26 @@ class StudentAssessmentResultView(APIView):
             student=request.user,
         )
 
-        # Calculate total marks for all questions
+        states_by_question = {
+            state.question_id: state
+            for state in (
+                attempt.question_states
+                .select_related("question", "selected_option")
+                .order_by("id")
+            )
+        }
+        unique_states = list(states_by_question.values())
         total_marks = sum(
             state.question.marks
-            for state in attempt.question_states.all()
+            for state in unique_states
+        )
+        correct_answers = sum(
+            1
+            for state in unique_states
+            if (
+                state.selected_option
+                and state.selected_option.is_correct
+            )
         )
 
         return Response({
@@ -1460,5 +1464,13 @@ class StudentAssessmentResultView(APIView):
 
             "completed_at": attempt.completed_at,
 
-            "total_questions": attempt.question_states.count(),
-        }) 
+            "total_questions": len(unique_states),
+
+            "correct_answers": correct_answers,
+
+            "percentage": (
+                attempt.score / total_marks * 100
+                if total_marks
+                else 0
+            ),
+        })

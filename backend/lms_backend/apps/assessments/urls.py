@@ -16,6 +16,8 @@ from .views import (
     RemoveCompletedAssessmentView,
 )
 
+app_name = 'assessments'
+
 
 urlpatterns = [
 

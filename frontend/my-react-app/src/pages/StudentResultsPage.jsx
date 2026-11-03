@@ -95,7 +95,7 @@ export default function StudentResultsPage() {
         </h1>
 
         <p className="text-sm text-slate-400 mb-6">
-          {result?.assessment || 'Assessment'}
+          {result?.exam_title || result?.assessment || 'Assessment'}
         </p>
 
         {/* Score */}

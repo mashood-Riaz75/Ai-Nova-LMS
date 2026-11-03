@@ -60,6 +60,14 @@ export default function StudentExamPage() {
       setQuestions(response.data.questions || []);
       setTaskDetails(response.data.task || {});
       setTimeLeft(response.data.remaining_seconds || 0);
+      const unansweredIndex = response.data.questions?.findIndex(
+        (question) => !question.is_answered
+      ) ?? -1;
+      setCurrentIndex(
+        response.data.current_question_index ??
+          Math.max(0, unansweredIndex)
+      );
+      setSelectedOption(null);
 
     } catch (err) {
       console.error(
@@ -133,7 +141,7 @@ export default function StudentExamPage() {
         `/assessments/${examId}/quit/`
       );
 
-      toast.success('Assessment quit successfully.');
+      toast.success('Assessment paused. You can resume it later.');
       navigate('/student/dashboard');
 
     } catch (err) {
