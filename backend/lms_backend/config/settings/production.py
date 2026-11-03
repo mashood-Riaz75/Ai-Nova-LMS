@@ -16,6 +16,24 @@ CSRF_TRUSTED_ORIGINS = [
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME", "").strip()
+CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY", "").strip()
+CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET", "").strip()
+
+if not all((CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)):
+    raise ImproperlyConfigured(
+        "CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and "
+        "CLOUDINARY_API_SECRET must be configured for production media storage."
+    )
+
+STORAGES = {
+    "default": {
+        "BACKEND": "apps.users.storage.CloudinaryMediaStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 DATABASES = {
     "default": dj_database_url.config(

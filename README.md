@@ -97,6 +97,16 @@ celery -A config worker --loglevel=info
 
 In the web service logs, `[EMAIL QUEUED]` means Redis accepted the task; in the worker logs, `[EMAIL DISPATCH]` means the email backend accepted it. Check Brevo's email activity for final delivery status.
 
+## Production Profile Images
+
+Production avatars are stored in Cloudinary so they remain available across Railway deployments. Add these environment variables to the Railway backend web service before deploying:
+
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+
+Find these values in the Cloudinary dashboard. Keep the API secret private and never commit it. The application fails to start in production if these credentials are missing. Local development continues to store uploaded media under `backend/lms_backend/media`.
+
 ## Useful Commands
 
 ```powershell
