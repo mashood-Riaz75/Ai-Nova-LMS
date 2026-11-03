@@ -56,20 +56,24 @@ export default function StudentDashboardPage() {
     formData.append('avatar', selectedAvatarFile);
 
     try {
-      await API.patch('/users/profile/me/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      await API.patch('/users/profile/me/', formData);
       await fetchStudentProfile();
       setSelectedAvatarFile(null);
       if (previewAvatarUrl) {
         URL.revokeObjectURL(previewAvatarUrl);
         setPreviewAvatarUrl(null);
       }
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      toast.success('Profile picture updated.');
     } catch (err) {
       console.error('Failed to upload avatar:', err.response?.data || err);
-      toast.error('Unable to update profile picture.');
+      const message =
+        err.response?.data?.avatar?.[0] ||
+        err.response?.data?.detail ||
+        'Unable to update profile picture. Please try again.';
+      toast.error(message);
     } finally {
       setAvatarUploading(false);
     }
@@ -138,54 +142,89 @@ export default function StudentDashboardPage() {
 
         <div className="grid gap-6 mb-8 lg:grid-cols-[320px_1fr]">
           <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="relative group w-20 h-20 rounded-full bg-slate-700 overflow-hidden border border-slate-600">
-                {profileLoading ? (
-                  <div className="w-full h-full bg-slate-700 animate-pulse" />
-                ) : selectedAvatarFile && previewAvatarUrl ? (
-                  <img
-                    src={previewAvatarUrl}
-                    alt="Avatar preview"
-                    className="w-full h-full object-cover"
-                  />
-                ) : studentProfile?.avatar ? (
-                  <img
-                    src={getAvatarUrl(studentProfile.avatar)}
-                    alt="Student avatar"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-700 text-slate-400 text-sm">
-                    No Image
+            <div className="flex flex-wrap items-center gap-4 mb-6">
+              <div className="flex shrink-0 items-center gap-3">
+                <div className="relative group w-20 h-20 rounded-full bg-slate-700 overflow-hidden border border-slate-600">
+                  {profileLoading ? (
+                    <div className="w-full h-full bg-slate-700 animate-pulse" />
+                  ) : selectedAvatarFile && previewAvatarUrl ? (
+                    <img
+                      src={previewAvatarUrl}
+                      alt="Avatar preview"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : studentProfile?.avatar ? (
+                    <img
+                      src={getAvatarUrl(studentProfile.avatar)}
+                      alt="Student avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-slate-700 text-slate-400 text-sm">
+                      No Image
+                    </div>
+                  )}
+                  {!selectedAvatarFile && (
+                    <div className="pointer-events-none absolute inset-0 bg-slate-900/0 transition-all duration-200 group-hover:bg-slate-900/70 flex flex-col items-center justify-center text-center opacity-0 group-hover:opacity-100">
+                      <div className="text-xs uppercase tracking-[0.24em] text-slate-200 mb-2">Profile actions</div>
+                      <div className="grid gap-2">
+                        <button
+                          type="button"
+                          onClick={handleViewProfile}
+                          className="pointer-events-auto inline-flex items-center justify-center px-3 py-1.5 bg-slate-700/95 text-white rounded-full text-xs font-semibold"
+                        >
+                          View profile
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="pointer-events-auto inline-flex items-center justify-center px-3 py-1.5 bg-indigo-600/90 text-white rounded-full text-xs font-semibold"
+                        >
+                          Change
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleDeleteAvatar}
+                          className="pointer-events-auto inline-flex items-center justify-center px-3 py-1.5 bg-rose-600/90 text-white rounded-full text-xs font-semibold"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarSelect}
+                  className="hidden"
+                />
+                {selectedAvatarFile && (
+                  <div className="rounded-lg border border-slate-700 bg-slate-900 p-3">
+                    <p className="mb-2 max-w-36 truncate text-xs text-slate-400" title={selectedAvatarFile.name}>
+                      {selectedAvatarFile.name}
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleConfirmAvatar}
+                        disabled={avatarUploading}
+                        className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-emerald-500 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                      >
+                        {avatarUploading ? 'Uploading...' : 'Confirm'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleCancelAvatar}
+                        disabled={avatarUploading}
+                        className="inline-flex items-center justify-center rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:bg-slate-600 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 )}
-
-                <div className="pointer-events-none absolute inset-0 bg-slate-900/0 transition-all duration-200 group-hover:bg-slate-900/70 flex flex-col items-center justify-center text-center opacity-0 group-hover:opacity-100">
-                  <div className="text-xs uppercase tracking-[0.24em] text-slate-200 mb-2">Profile actions</div>
-                  <div className="grid gap-2">
-                    <button
-                      type="button"
-                      onClick={handleViewProfile}
-                      className="pointer-events-auto inline-flex items-center justify-center px-3 py-1.5 bg-slate-700/95 text-white rounded-full text-xs font-semibold"
-                    >
-                      View profile
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="pointer-events-auto inline-flex items-center justify-center px-3 py-1.5 bg-indigo-600/90 text-white rounded-full text-xs font-semibold"
-                    >
-                      Change
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleDeleteAvatar}
-                      className="pointer-events-auto inline-flex items-center justify-center px-3 py-1.5 bg-rose-600/90 text-white rounded-full text-xs font-semibold"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-white">{studentProfile?.first_name || 'Student'} {studentProfile?.last_name || ''}</h2>
@@ -236,38 +275,6 @@ export default function StudentDashboardPage() {
               </div>
             </div>
 
-            <div className="mt-6">
-              <label className="block text-xs text-slate-400 mb-2">Profile picture controls</label>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarSelect}
-                className="hidden"
-              />
-              {selectedAvatarFile && (
-                <div className="rounded-xl border border-slate-700 bg-slate-900 p-4">
-                  <div className="text-sm text-slate-300 mb-3">Preview selected image before upload.</div>
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={handleConfirmAvatar}
-                      disabled={avatarUploading}
-                      className="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
-                    >
-                      {avatarUploading ? 'Uploading...' : 'Confirm'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleCancelAvatar}
-                      className="inline-flex items-center justify-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
 
           <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-xl flex flex-col justify-center">
