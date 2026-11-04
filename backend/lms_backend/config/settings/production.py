@@ -1,6 +1,8 @@
 import os
+
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
+
 from .dev import *
 
 SECRET_KEY = os.environ["SECRET_KEY"]
