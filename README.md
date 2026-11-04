@@ -99,7 +99,7 @@ In the web service logs, `[EMAIL QUEUED]` means Redis accepted the task; in the 
 
 ## Production Profile Images
 
-Production avatars are stored in Cloudinary so they remain available across Railway deployments. Add these environment variables to the Railway backend web service before deploying:
+Production avatars are stored in Cloudinary so they remain available across Railway deployments. Add these environment variables to both the Railway backend web service and its Celery worker before deploying:
 
 - `CLOUDINARY_CLOUD_NAME`
 - `CLOUDINARY_API_KEY`
