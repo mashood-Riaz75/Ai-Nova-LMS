@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 
 import { AuthProvider } from './context/AuthContext';
-import { ProtectedRoute } from './components/ProtectedRoute';
+import { ProtectedRoute, PublicOnlyRoute } from './components/ProtectedRoute';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -38,7 +38,14 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
 
             {/* Public Login Route */}
-            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/login"
+              element={
+                <PublicOnlyRoute>
+                  <LoginPage />
+                </PublicOnlyRoute>
+              }
+            />
 
             {/* Teacher Routes */}
             <Route
@@ -106,4 +113,3 @@ export default function App() {
     </AuthProvider>
   );
 }
-

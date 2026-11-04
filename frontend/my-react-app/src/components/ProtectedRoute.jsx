@@ -14,3 +14,15 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
 
   return children;
 };
+
+export const PublicOnlyRoute = ({ children }) => {
+  const { user } = useAuth();
+
+  if (user) {
+    const dashboard =
+      user.role === 'TEACHER' ? '/teacher/dashboard' : '/student/dashboard';
+    return <Navigate to={dashboard} replace />;
+  }
+
+  return children;
+};
