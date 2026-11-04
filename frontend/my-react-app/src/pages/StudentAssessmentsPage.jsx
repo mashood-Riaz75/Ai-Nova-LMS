@@ -12,7 +12,68 @@ import {
   Trash2,
   Eye,
   Search,
+  ListChecks,
+  ShieldAlert,
 } from 'lucide-react';
+
+function AssessmentGuidance() {
+  return (
+    <section
+      aria-labelledby="assessment-guidance-heading"
+      className="mb-6 rounded-2xl border border-indigo-400/20 bg-indigo-500/5 p-5 sm:p-6"
+    >
+      <div className="mb-4 flex items-start gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-300">
+          <ListChecks aria-hidden="true" className="h-5 w-5" />
+        </span>
+        <div>
+          <h2
+            id="assessment-guidance-heading"
+            className="font-semibold text-white"
+          >
+            Before you start
+          </h2>
+          <p className="mt-1 text-sm text-slate-400">
+            A few tips to help you complete your assessment confidently.
+          </p>
+        </div>
+      </div>
+
+      <ol className="grid gap-3 sm:grid-cols-3">
+        <li className="rounded-xl border border-slate-700/80 bg-slate-900/40 p-4">
+          <p className="text-sm font-semibold text-slate-200">1. Start when ready</p>
+          <p className="mt-1 text-sm leading-5 text-slate-400">
+            Choose <span className="font-medium text-indigo-300">Start Assessment</span>;
+            if you paused before, choose <span className="font-medium text-indigo-300">Resume Assessment</span>.
+            Your timer runs during the attempt.
+          </p>
+        </li>
+        <li className="rounded-xl border border-slate-700/80 bg-slate-900/40 p-4">
+          <p className="text-sm font-semibold text-slate-200">2. Answer one at a time</p>
+          <p className="mt-1 text-sm leading-5 text-slate-400">
+            Select an option, then choose <span className="font-medium text-indigo-300">Next &amp; Lock Answer</span>.
+            Locked answers and previous questions cannot be changed or revisited.
+          </p>
+        </li>
+        <li className="rounded-xl border border-slate-700/80 bg-slate-900/40 p-4">
+          <p className="text-sm font-semibold text-slate-200">3. Finish or pause</p>
+          <p className="mt-1 text-sm leading-5 text-slate-400">
+            On the final question, submit to finish. Choose{' '}
+            <span className="font-medium text-indigo-300">Quit Assessment</span> to pause;
+            you can resume it later.
+          </p>
+        </li>
+      </ol>
+
+      <p className="mt-4 flex items-start gap-2 text-xs leading-5 text-amber-300">
+        <ShieldAlert aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
+        <span>
+          Check your selection before continuing: once an answer is locked, it cannot be edited.
+        </span>
+      </p>
+    </section>
+  );
+}
 
 
 const formatDateTime = (value) => {
@@ -290,6 +351,8 @@ export default function StudentAssessmentsPage() {
 
           </div>
 
+          <AssessmentGuidance />
+
           <div className="text-center p-8 text-slate-400 bg-slate-800 rounded-xl border border-slate-700">
 
             No assessments available.
@@ -328,6 +391,7 @@ export default function StudentAssessmentsPage() {
 
         </div>
 
+        <AssessmentGuidance />
 
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-sm">
