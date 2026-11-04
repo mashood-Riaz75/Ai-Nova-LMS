@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, GraduationCap, Award, ArrowRight, UserCheck } from 'lucide-react';
 import Footer from '../components/Footer';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function HomePage() {
   return (
@@ -13,6 +14,7 @@ export default function HomePage() {
           <span className="text-xl font-bold text-slate-800">EduLMS</span>
         </div>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           <Link
             to="/login"
             className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-indigo-600 transition"

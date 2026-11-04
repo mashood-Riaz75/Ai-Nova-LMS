@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import API from '../service/Api';
 import { Trophy, Home } from 'lucide-react';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function StudentResultsPage() {
   const { attemptId } = useParams();
@@ -38,33 +39,43 @@ export default function StudentResultsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center text-slate-400">
-        Computing assessment score...
-      </div>
+      <>
+        <div className="fixed right-4 top-4 z-10 sm:right-6 sm:top-6">
+          <ThemeToggle />
+        </div>
+        <div className="min-h-screen bg-slate-900 flex items-center justify-center text-slate-400">
+          Computing assessment score...
+        </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-8">
-        <div className="max-w-md w-full bg-slate-800 rounded-2xl p-8 border border-slate-700 text-center">
-          <h1 className="text-xl font-bold text-white mb-3">
-            Unable to Load Result
-          </h1>
-
-          <p className="text-sm text-slate-400 mb-6">
-            {error}
-          </p>
-
-          <button
-            onClick={() => navigate('/student/dashboard')}
-            className="w-full flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-lg transition-all"
-          >
-            <Home className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </button>
+      <>
+        <div className="fixed right-4 top-4 z-10 sm:right-6 sm:top-6">
+          <ThemeToggle />
         </div>
-      </div>
+        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-8">
+          <div className="max-w-md w-full bg-slate-800 rounded-2xl p-8 border border-slate-700 text-center">
+            <h1 className="text-xl font-bold text-white mb-3">
+              Unable to Load Result
+            </h1>
+
+            <p className="text-sm text-slate-400 mb-6">
+              {error}
+            </p>
+
+            <button
+              onClick={() => navigate('/student/dashboard')}
+              className="w-full flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-lg transition-all"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </button>
+          </div>
+        </div>
+      </>
     );
   }
 
@@ -81,8 +92,12 @@ export default function StudentResultsPage() {
         : 0;
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-8 flex flex-col items-center justify-center">
-      <div className="max-w-md w-full bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-2xl text-center">
+    <>
+      <div className="fixed right-4 top-4 z-10 sm:right-6 sm:top-6">
+        <ThemeToggle />
+      </div>
+      <div className="min-h-screen bg-slate-900 text-slate-100 p-8 flex flex-col items-center justify-center">
+        <div className="max-w-md w-full bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-2xl text-center">
 
         {/* Trophy */}
         <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-full w-fit mx-auto mb-4">
@@ -153,7 +168,8 @@ export default function StudentResultsPage() {
           Back to Dashboard
         </button>
 
+        </div>
       </div>
-    </div>
+    </>
   );
 }

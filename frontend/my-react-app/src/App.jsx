@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom';
 
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { ProtectedRoute, PublicOnlyRoute } from './components/ProtectedRoute';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,91 +26,93 @@ const StudentResultsPage = lazy(() => import('./pages/StudentResultsPage'));
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Suspense
-          fallback={
-            <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-300">
-              Loading...
-            </div>
-          }
-        >
-          <Routes>
-            {/* Public Home Page */}
-            <Route path="/" element={<HomePage />} />
+      <ThemeProvider>
+        <Router>
+          <Suspense
+            fallback={
+              <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-300">
+                Loading...
+              </div>
+            }
+          >
+            <Routes>
+              {/* Public Home Page */}
+              <Route path="/" element={<HomePage />} />
 
-            {/* Public Login Route */}
-            <Route
-              path="/login"
-              element={
-                <PublicOnlyRoute>
-                  <LoginPage />
-                </PublicOnlyRoute>
-              }
-            />
+              {/* Public Login Route */}
+              <Route
+                path="/login"
+                element={
+                  <PublicOnlyRoute>
+                    <LoginPage />
+                  </PublicOnlyRoute>
+                }
+              />
 
-            {/* Teacher Routes */}
-            <Route
-              path="/teacher/dashboard"
-              element={
-                <ProtectedRoute allowedRoles={['TEACHER']}>
-                  <TeacherDashboardPage />
-                </ProtectedRoute>
-              }
-            />
+              {/* Teacher Routes */}
+              <Route
+                path="/teacher/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={['TEACHER']}>
+                    <TeacherDashboardPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/teacher/assessments"
-              element={
-                <ProtectedRoute allowedRoles={['TEACHER']}>
-                  <TeacherAssessmentsPage />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/teacher/assessments"
+                element={
+                  <ProtectedRoute allowedRoles={['TEACHER']}>
+                    <TeacherAssessmentsPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Student Routes */}
-            <Route
-              path="/student/dashboard"
-              element={
-                <ProtectedRoute allowedRoles={['STUDENT']}>
-                  <StudentDashboardPage />
-                </ProtectedRoute>
-              }
-            />
+              {/* Student Routes */}
+              <Route
+                path="/student/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={['STUDENT']}>
+                    <StudentDashboardPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/student/assessments"
-              element={
-                <ProtectedRoute allowedRoles={['STUDENT']}>
-                  <StudentAssessmentsPage />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/student/assessments"
+                element={
+                  <ProtectedRoute allowedRoles={['STUDENT']}>
+                    <StudentAssessmentsPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/student/exam/:examId"
-              element={
-                <ProtectedRoute allowedRoles={['STUDENT']}>
-                  <StudentExamPage />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/student/exam/:examId"
+                element={
+                  <ProtectedRoute allowedRoles={['STUDENT']}>
+                    <StudentExamPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/student/results/:attemptId"
-              element={
-                <ProtectedRoute allowedRoles={['STUDENT']}>
-                  <StudentResultsPage />
-                </ProtectedRoute>
-              }
-            />
+              <Route
+                path="/student/results/:attemptId"
+                element={
+                  <ProtectedRoute allowedRoles={['STUDENT']}>
+                    <StudentResultsPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Catch-all Fallback Route */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
+              {/* Catch-all Fallback Route */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
 
-        <ToastContainer />
-      </Router>
+          <ToastContainer />
+        </Router>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

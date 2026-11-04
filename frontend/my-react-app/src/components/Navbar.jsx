@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import API from '../service/Api';
 import { LogOut, GraduationCap, User, ListChecks, BookOpen } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -80,6 +81,7 @@ export default function Navbar() {
               {user.role}
             </span>
           </div>
+          <ThemeToggle />
           <button
             onClick={() => {
               if (window.confirm('Are you sure you want to log out?')) {
